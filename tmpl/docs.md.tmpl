@@ -1,0 +1,32 @@
+libdns providers
+=======================
+
+# Index
+{{- range .Providers }}
+1. [{{ .Name }}](#{{ .Name }})
+{{- end }}
+
+# Providers
+{{- range .Providers }}
+
+## {{ .Name }}
+
+{{ .Readme.Authentication }}
+
+**Variables:**
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+{{- range .Variables }}
+| {{ .Name }} | {{if .Doc }}{{ Replace .Doc "\n" "<br>" }}{{ else }}-{{ end }} | {{ .Type }} | {{ .Required }} |
+{{- end }}
+
+**Example:**
+```go
+provider, err := libdnsfactory.NewProvider("{{ .Name }}", map[string]string{
+{{- range .Variables }}
+    "{{ .Name }}": "...",
+{{- end }}
+})
+```
+
+{{- end }}
