@@ -10,7 +10,7 @@ import (
 {{- end }}
 )
 
-// NewProvider creates a new Provider
+// NewProvider creates a new Provider. See https://github.com/matthiasng/libdnsfactory/blob/master/docs.md for a complete list of supported providers.
 func NewProvider(name string, config map[string]string) (Provider, error) {
 	switch name {
 {{- range $p := .Providers }}

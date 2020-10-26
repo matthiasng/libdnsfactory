@@ -14,7 +14,6 @@ The [factory](https://github.com/matthiasng/libdnsfactory/blob/master/factory.go
 go get -u github.com/matthiasng/libdnsfactory
 ```
 
-
 # Example
 
 ```go
@@ -47,3 +46,6 @@ func main() {
 
 ```
 
+# Dev
+
+To update an existing provider or add a new one, run `go get -u github.com/libdns/...` and `go run ./generate`.
