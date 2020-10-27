@@ -42,6 +42,8 @@ provider, err := libdnsfactory.NewProvider("cloudflare", map[string]string{
 })
 ```
 
+**Repository**: [https://github.com/libdns/cloudflare](https://github.com/libdns/cloudflare)
+
 ## digitalocean
 
 To authenticate you need to supply a DigitalOcean API token.
@@ -58,6 +60,8 @@ provider, err := libdnsfactory.NewProvider("digitalocean", map[string]string{
 })
 ```
 
+**Repository**: [https://github.com/libdns/digitalocean](https://github.com/libdns/digitalocean)
+
 ## dnspod
 
 To authenticate you need to supply a [DNSPOD API token](https://support.dnspod.cn/Kb/showarticle/tsid/227/).
@@ -73,6 +77,8 @@ provider, err := libdnsfactory.NewProvider("dnspod", map[string]string{
     "APIToken": "...",
 })
 ```
+
+**Repository**: [https://github.com/libdns/dnspod](https://github.com/libdns/dnspod)
 
 ## gandi
 
@@ -92,6 +98,8 @@ provider, err := libdnsfactory.NewProvider("gandi", map[string]string{
 })
 ```
 
+**Repository**: [https://github.com/libdns/gandi](https://github.com/libdns/gandi)
+
 ## hetzner
 
 To authenticate you need to supply a Hetzner [Auth-API-Token](https://dns.hetzner.com/api-docs#section/Authentication/Auth-API-Token).
@@ -107,6 +115,8 @@ provider, err := libdnsfactory.NewProvider("hetzner", map[string]string{
     "AuthAPIToken": "...",
 })
 ```
+
+**Repository**: [https://github.com/libdns/hetzner](https://github.com/libdns/hetzner)
 
 ## route53
 
@@ -155,3 +165,5 @@ provider, err := libdnsfactory.NewProvider("route53", map[string]string{
     "MaxRetries": "...",
 })
 ```
+
+**Repository**: [https://github.com/libdns/route53](https://github.com/libdns/route53)
