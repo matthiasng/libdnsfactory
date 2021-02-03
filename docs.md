@@ -2,14 +2,82 @@ libdns providers
 =======================
 
 # Index
+1. [alidns](#alidns)
+1. [azure](#azure)
 1. [cloudflare](#cloudflare)
 1. [digitalocean](#digitalocean)
 1. [dnspod](#dnspod)
 1. [gandi](#gandi)
 1. [hetzner](#hetzner)
+1. [openstack-designate](#openstack-designate)
 1. [route53](#route53)
+1. [transip](#transip)
+1. [vultr](#vultr)
 
 # Providers
+
+## alidns
+
+To authenticate you need to supply our AccessKeyId and AccessKeySecret to the Provider.
+
+**Variables:**
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| AccKeyID | - | string | true |
+| AccKeySecret | - | string | true |
+| RegionID | - | string | false |
+
+**Example:**
+```go
+provider, err := libdnsfactory.NewProvider("alidns", map[string]string{
+    "AccKeyID": "...",
+    "AccKeySecret": "...",
+    "RegionID": "...",
+})
+```
+
+**Repository**: [https://github.com/libdns/alidns](https://github.com/libdns/alidns)
+
+## azure
+
+This package supports authentication using the **Client Credentials** (Azure AD Application ID and Secret) through [azure-sdk-for-go](https://github.com/Azure/azure-sdk-for-go).
+
+You will need to create a service principal using [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) or [Azure Portal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal), and assign the **DNS Zone Contributor** role to the service principal for the DNS zones that you want to manage.
+
+Then keep the following information to pass to the `Provider` struct fields for authentication:
+
+* `TenantId` (`json:"tenant_id"`)
+	* [Azure Active Directory] > [Properties] > [Tenant ID]
+* `ClientId` (`json:"client_id"`)
+	* [Azure Active Directory] > [App registrations] > Your Application > [Application ID]
+* `ClientSecret` (`json:"client_secret"`)
+	* [Azure Active Directory] > [App registrations] > Your Application > [Certificates & secrets] > [Client secrets] > [Value]
+* `SubscriptionId` (`json:"subscription_id"`)
+	* [DNS zones] > Your Zone > [Subscription ID]
+* `ResourceGroupName` (`json:"resource_group_name"`)
+	* [DNS zones] > Your Zone > [Resource group]
+
+**Variables:**
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| TenantId | - | string | false |
+| ClientId | - | string | false |
+| ClientSecret | - | string | false |
+| SubscriptionId | - | string | false |
+| ResourceGroupName | - | string | false |
+
+**Example:**
+```go
+provider, err := libdnsfactory.NewProvider("azure", map[string]string{
+    "TenantId": "...",
+    "ClientId": "...",
+    "ClientSecret": "...",
+    "SubscriptionId": "...",
+    "ResourceGroupName": "...",
+})
+```
+
+**Repository**: [https://github.com/libdns/azure](https://github.com/libdns/azure)
 
 ## cloudflare
 
@@ -118,9 +186,27 @@ provider, err := libdnsfactory.NewProvider("hetzner", map[string]string{
 
 **Repository**: [https://github.com/libdns/hetzner](https://github.com/libdns/hetzner)
 
+## openstack-designate
+
+To authenticate you need to supply a OpenStack API credentials and zone name on which you want to operate.
+
+**Variables:**
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| AuthOpenStack | - | AuthOpenStack | true |
+
+**Example:**
+```go
+provider, err := libdnsfactory.NewProvider("openstack-designate", map[string]string{
+    "AuthOpenStack": "...",
+})
+```
+
+**Repository**: [https://github.com/libdns/openstack-designate](https://github.com/libdns/openstack-designate)
+
 ## route53
 
-This package supports all the credential configuration methods described in the [AWS Developer Guide](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html), such as `Environment Variables`, `EC2 Instance Profile` and the `AWS Credentials file` located in `.aws/credentials`
+This package supports all the credential configuration methods described in the [AWS Developer Guide](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html), such as `Environment Variables`, `EC2 Instance Profile` and the `AWS Credentials file` located in `.aws/credentials`. You may also pass in static credentials directly (or via caddy's configuration).
 
 The following IAM policy is a minimal working example to give `libdns` permissions to manage DNS records:
 
@@ -158,12 +244,56 @@ The following IAM policy is a minimal working example to give `libdns` permissio
 | Name | Description | Type | Required |
 |------|-------------|------|----------|
 | MaxRetries | - | int | false |
+| AWSProfile | - | string | false |
+| AccessKeyId | - | string | false |
+| SecretAccessKey | - | string | false |
 
 **Example:**
 ```go
 provider, err := libdnsfactory.NewProvider("route53", map[string]string{
     "MaxRetries": "...",
+    "AWSProfile": "...",
+    "AccessKeyId": "...",
+    "SecretAccessKey": "...",
 })
 ```
 
 **Repository**: [https://github.com/libdns/route53](https://github.com/libdns/route53)
+
+## transip
+
+To authenticate you need to supply our AccountName and the path to your private key file to the Provider.
+
+**Variables:**
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| AccountName | - | string | true |
+| PrivateKeyPath | - | string | true |
+
+**Example:**
+```go
+provider, err := libdnsfactory.NewProvider("transip", map[string]string{
+    "AccountName": "...",
+    "PrivateKeyPath": "...",
+})
+```
+
+**Repository**: [https://github.com/libdns/transip](https://github.com/libdns/transip)
+
+## vultr
+
+To authenticate you need to supply a Vultr API token.
+
+**Variables:**
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| APIToken | APIToken is the Vultr API token<br>see https://my.vultr.com/settings/#settingsapi | string | true |
+
+**Example:**
+```go
+provider, err := libdnsfactory.NewProvider("vultr", map[string]string{
+    "APIToken": "...",
+})
+```
+
+**Repository**: [https://github.com/libdns/vultr](https://github.com/libdns/vultr)
