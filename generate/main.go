@@ -25,6 +25,7 @@ type tmplVars struct {
 
 type providerInfo struct {
 	Name        string
+	Path        string
 	PackageName string
 	Version     string
 	Variables   []varInfo
@@ -160,6 +161,7 @@ func getProviders() ([]providerInfo, error) {
 		}
 
 		provider := providerInfo{
+			Path:        req.Mod.Path,
 			Name:        filepath.Base(req.Mod.Path),
 			PackageName: packageName,
 			Version:     req.Mod.Version,

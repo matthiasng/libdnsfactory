@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 {{- range .Providers }}
-    "github.com/libdns/{{ .Name }}"
+    "{{ .Path }}"
 {{- end }}
 )
 

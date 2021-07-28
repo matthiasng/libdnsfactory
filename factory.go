@@ -4,7 +4,7 @@ package libdnsfactory
 
 import (
 	"fmt"
-    "github.com/libdns/inwx"
+    "github.com/Alfschmalf/inwx"
     "github.com/libdns/alidns"
     "github.com/libdns/azure"
     "github.com/libdns/cloudflare"
