@@ -2,6 +2,7 @@ libdns providers
 =======================
 
 # Index
+1. [inwx](#inwx)
 1. [alidns](#alidns)
 1. [azure](#azure)
 1. [cloudflare](#cloudflare)
@@ -14,6 +15,26 @@ libdns providers
 1. [vultr](#vultr)
 
 # Providers
+
+## inwx
+
+To authenticate you need to supply your INWX Username and Password.
+
+**Variables:**
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+| AuthUsername | AuthUsername is the INWX Username | string | true |
+| AuthPassword | AuthPassword is the INWX Password | string | true |
+
+**Example:**
+```go
+provider, err := libdnsfactory.NewProvider("inwx", map[string]string{
+    "AuthUsername": "...",
+    "AuthPassword": "...",
+})
+```
+
+**Repository**: [https://github.com/libdns/inwx](https://github.com/libdns/inwx)
 
 ## alidns
 

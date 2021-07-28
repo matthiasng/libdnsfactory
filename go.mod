@@ -27,6 +27,7 @@ require (
 	github.com/libdns/route53 v1.1.1
 	github.com/libdns/transip v0.0.0-20200914183413-fcc048c98fe7
 	github.com/libdns/vultr v0.0.0-20201128180404-1d5ee21ea62f
+	github.com/pkg/errors v0.9.1
 	github.com/rogpeppe/go-internal v1.3.0
 	github.com/transip/gotransip v5.8.2+incompatible // indirect
 	github.com/vultr/govultr/v2 v2.7.1 // indirect

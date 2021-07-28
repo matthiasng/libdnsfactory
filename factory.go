@@ -4,6 +4,7 @@ package libdnsfactory
 
 import (
 	"fmt"
+    "github.com/libdns/inwx"
     "github.com/libdns/alidns"
     "github.com/libdns/azure"
     "github.com/libdns/cloudflare"
@@ -19,6 +20,19 @@ import (
 // NewProvider creates a new Provider. See https://github.com/matthiasng/libdnsfactory/blob/master/docs.md for a complete list of supported providers.
 func NewProvider(name string, config map[string]string) (Provider, error) {
 	switch name {
+        case "inwx":
+            var err error
+            p := &inwx.Provider{}
+            p.AuthUsername, err = getValueString("AuthUsername", true, config)
+            if err != nil {
+                return nil, fmt.Errorf("inwx [AuthUsername]: %w", err)
+            }
+            p.AuthPassword, err = getValueString("AuthPassword", true, config)
+            if err != nil {
+                return nil, fmt.Errorf("inwx [AuthPassword]: %w", err)
+            }
+
+            return p, nil
         case "alidns":
             var err error
             p := &alidns.Provider{}

@@ -14,6 +14,7 @@ import (
 	"unicode"
 
 	"github.com/fatih/structtag"
+	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/module"
 	"golang.org/x/mod/modfile"
 )
@@ -73,11 +74,11 @@ func includeModule(req *modfile.Require) bool {
 		return false
 	}
 
-	if !strings.HasPrefix(req.Mod.Path, "github.com/libdns/") || !strings.HasPrefix(req.Mod.Path, "github.com/Alfschmalf/inwx") {
-		return false
+	if strings.HasPrefix(req.Mod.Path, "github.com/libdns/") || strings.HasPrefix(req.Mod.Path, "github.com/Alfschmalf/inwx") {
+		return true
 	}
 
-	return true
+	return false
 }
 
 func generateFile(tmplName string, providers []providerInfo) error {
@@ -126,32 +127,36 @@ func getProviders() ([]providerInfo, error) {
 
 	data, err := ioutil.ReadFile("./go.mod")
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "loading modfile")
 	}
 
 	modFile, err := modfile.Parse("./go.mod", data, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "parsing modfile")
 	}
 
 	providers := []providerInfo{}
 
 	for _, req := range modFile.Require {
-		if includeModule(req) {
+		if !includeModule(req) {
 			continue
 		}
 
-		encodedModName, err := module.EncodePath(req.Mod.String())
+		encodedModName, err := module.EncodePath(req.Mod.Path)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "encoding module path")
+		}
+		encodedModVersion, err := module.EncodeVersion(req.Mod.Version)
+		if err != nil {
+			return nil, errors.Wrap(err, "encoding module version")
 		}
 
-		dir := filepath.Join(goModCache, encodedModName)
+		dir := filepath.Join(goModCache, encodedModName+"@"+encodedModVersion)
 		providerFilename := filepath.Join(dir, "provider.go")
 
 		packageName, err := getPackageNameFromFile(providerFilename)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "getting package name")
 		}
 
 		provider := providerInfo{
