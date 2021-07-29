@@ -9,7 +9,6 @@ libdns providers
 1. [dnspod](#dnspod)
 1. [gandi](#gandi)
 1. [hetzner](#hetzner)
-1. [openstack-designate](#openstack-designate)
 1. [route53](#route53)
 1. [transip](#transip)
 1. [vultr](#vultr)
@@ -185,24 +184,6 @@ provider, err := libdnsfactory.NewProvider("hetzner", map[string]string{
 ```
 
 **Repository**: [https://github.com/libdns/hetzner](https://github.com/libdns/hetzner)
-
-## openstack-designate
-
-To authenticate you need to supply a OpenStack API credentials and zone name on which you want to operate.
-
-**Variables:**
-| Name | Description | Type | Required |
-|------|-------------|------|----------|
-| AuthOpenStack | - | AuthOpenStack | true |
-
-**Example:**
-```go
-provider, err := libdnsfactory.NewProvider("openstack-designate", map[string]string{
-    "AuthOpenStack": "...",
-})
-```
-
-**Repository**: [https://github.com/libdns/openstack-designate](https://github.com/libdns/openstack-designate)
 
 ## route53
 

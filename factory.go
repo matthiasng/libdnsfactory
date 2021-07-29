@@ -11,7 +11,6 @@ import (
     "github.com/libdns/dnspod"
     "github.com/libdns/gandi"
     "github.com/libdns/hetzner"
-    "github.com/libdns/openstack-designate"
     "github.com/libdns/route53"
     "github.com/libdns/transip"
     "github.com/libdns/vultr"
@@ -104,15 +103,6 @@ func NewProvider(name string, config map[string]string) (Provider, error) {
             p.AuthAPIToken, err = getValueString("AuthAPIToken", true, config)
             if err != nil {
                 return nil, fmt.Errorf("hetzner [AuthAPIToken]: %w", err)
-            }
-
-            return p, nil
-        case "openstack-designate":
-            var err error
-            p := &openstack-designate.Provider{}
-            p.AuthOpenStack, err = getValueAuthOpenStack("AuthOpenStack", true, config)
-            if err != nil {
-                return nil, fmt.Errorf("openstack-designate [AuthOpenStack]: %w", err)
             }
 
             return p, nil
