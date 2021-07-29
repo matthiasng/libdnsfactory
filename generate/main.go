@@ -14,6 +14,8 @@ import (
 	"unicode"
 
 	"github.com/fatih/structtag"
+	"github.com/pkg/errors"
+	"github.com/rogpeppe/go-internal/module"
 	"golang.org/x/mod/modfile"
 )
 
@@ -22,10 +24,11 @@ type tmplVars struct {
 }
 
 type providerInfo struct {
-	Name      string
-	Version   string
-	Variables []varInfo
-	Readme    reamdeInfo
+	Name        string
+	PackageName string
+	Version     string
+	Variables   []varInfo
+	Readme      reamdeInfo
 }
 
 type varInfo struct {
@@ -66,6 +69,18 @@ func main() {
 	}
 }
 
+func includeModule(req *modfile.Require) bool {
+	if strings.HasPrefix(req.Mod.Path, "github.com/libdns/libdns") {
+		return false
+	}
+
+	if strings.HasPrefix(req.Mod.Path, "github.com/libdns/") || strings.HasPrefix(req.Mod.Path, "github.com/Alfschmalf/inwx") {
+		return true
+	}
+
+	return false
+}
+
 func generateFile(tmplName string, providers []providerInfo) error {
 	tmplFilename := fmt.Sprintf("./tmpl/%s.tmpl", tmplName)
 	tmplFile, err := ioutil.ReadFile(tmplFilename)
@@ -81,7 +96,7 @@ func generateFile(tmplName string, providers []providerInfo) error {
 		"Replace": strings.ReplaceAll,
 	}
 
-	tmpl, err := template.New("test").Funcs(funcMap).Parse(string(tmplFile))
+	tmpl, err := template.New(tmplName).Funcs(funcMap).Parse(string(tmplFile))
 	if err != nil {
 		return err
 	}
@@ -97,46 +112,12 @@ func generateFile(tmplName string, providers []providerInfo) error {
 	}
 
 	targetFilename := fmt.Sprintf("./%s", tmplName)
-	err = ioutil.WriteFile(targetFilename, buf.Bytes(), 640)
+	err = ioutil.WriteFile(targetFilename, buf.Bytes(), 0640)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("update: %s -> %s\n", tmplFilename, targetFilename)
-
-	return nil
-}
-
-func generateFactoryGo(providers []providerInfo) error {
-	tmplFile, err := ioutil.ReadFile("./factory.go.tmpl")
-	if err != nil {
-		return err
-	}
-
-	funcMap := template.FuncMap{
-		"ToUpper": strings.ToUpper,
-	}
-
-	tmpl, err := template.New("test").Funcs(funcMap).Parse(string(tmplFile))
-	if err != nil {
-		return err
-	}
-
-	tmplVars := tmplVars{
-		Providers: providers,
-	}
-
-	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, &tmplVars)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile("./factory.go", buf.Bytes(), 640)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -146,30 +127,45 @@ func getProviders() ([]providerInfo, error) {
 
 	data, err := ioutil.ReadFile("./go.mod")
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "loading modfile")
 	}
 
 	modFile, err := modfile.Parse("./go.mod", data, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "parsing modfile")
 	}
 
 	providers := []providerInfo{}
 
 	for _, req := range modFile.Require {
-		if !strings.HasPrefix(req.Mod.Path, "github.com/libdns/") || strings.HasPrefix(req.Mod.Path, "github.com/libdns/libdns") {
+		if !includeModule(req) {
 			continue
 		}
 
-		dir := filepath.Join(goModCache, req.Mod.String())
+		encodedModName, err := module.EncodePath(req.Mod.Path)
+		if err != nil {
+			return nil, errors.Wrap(err, "encoding module path")
+		}
+		encodedModVersion, err := module.EncodeVersion(req.Mod.Version)
+		if err != nil {
+			return nil, errors.Wrap(err, "encoding module version")
+		}
+
+		dir := filepath.Join(goModCache, encodedModName+"@"+encodedModVersion)
+		providerFilename := filepath.Join(dir, "provider.go")
+
+		packageName, err := getPackageNameFromFile(providerFilename)
+		if err != nil {
+			return nil, errors.Wrap(err, "getting package name")
+		}
 
 		provider := providerInfo{
-			Name:    filepath.Base(req.Mod.Path),
-			Version: req.Mod.Version,
+			Name:        filepath.Base(req.Mod.Path),
+			PackageName: packageName,
+			Version:     req.Mod.Version,
 		}
 
 		// get provider info from source
-		providerFilename := filepath.Join(dir, "provider.go")
 		providerFile, err := ioutil.ReadFile(providerFilename)
 		if err != nil {
 			return nil, err
@@ -271,4 +267,19 @@ func getProviders() ([]providerInfo, error) {
 	}
 
 	return providers, nil
+}
+
+func getPackageNameFromFile(filename string) (string, error) {
+	fset := token.NewFileSet()
+
+	astFile, err := parser.ParseFile(fset, filename, nil, parser.PackageClauseOnly)
+	if err != nil {
+		return "", err
+	}
+
+	if astFile.Name == nil {
+		return "", fmt.Errorf("no package found")
+	}
+
+	return astFile.Name.Name, nil
 }

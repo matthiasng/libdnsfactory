@@ -16,7 +16,7 @@ func NewProvider(name string, config map[string]string) (Provider, error) {
 {{- range $p := .Providers }}
         case "{{ $p.Name }}":
             var err error
-            p := &{{ $p.Name }}.Provider{}
+            p := &{{ $p.PackageName }}.Provider{}
             
 {{- range .Variables }}
             p.{{ .Name }}, err = getValue{{ .Type | FirstToUpper }}("{{ .Name }}", {{ .Required }}, config)
@@ -25,7 +25,7 @@ func NewProvider(name string, config map[string]string) (Provider, error) {
             }
 {{- end }}
 
-            return p, nil 
+            return p, nil
 {{- end }}
 	default:
 		return nil, fmt.Errorf("Unknown provider: %s", name)
